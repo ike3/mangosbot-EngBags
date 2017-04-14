@@ -1287,16 +1287,14 @@ function EngBot_Sort_item_cache()
 		return;
 	end
 
-		if (EngBotConfig["show_Bag"..bagnum] == 1) then
-			bagNumSlots = table.getn(EngBot_item_cache[bagnum]);
-			if (bagNumSlots > 0) then
-				for slotnum = 1, bagNumSlots do
-					EngBot_item_cache[bagnum][slotnum] = EngBot_PickBar( EngBot_item_cache[bagnum][slotnum] );
+        bagNumSlots = table.getn(EngBot_item_cache[bagnum]);
+        if (bagNumSlots > 0) then
+            for slotnum = 1, bagNumSlots do
+                EngBot_item_cache[bagnum][slotnum] = EngBot_PickBar( EngBot_item_cache[bagnum][slotnum] );
 
-					table.insert( EngBot_bar_positions[ EngBot_item_cache[bagnum][slotnum]["bar"] ], { ["bagnum"]=bagnum, ["slotnum"]=slotnum } );
-				end
-			end
-		end
+                table.insert( EngBot_bar_positions[ EngBot_item_cache[bagnum][slotnum]["bar"] ], { ["bagnum"]=bagnum, ["slotnum"]=slotnum } );
+            end
+        end
 	end
 
         -- sort the cache now
