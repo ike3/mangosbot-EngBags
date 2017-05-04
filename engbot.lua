@@ -2224,31 +2224,11 @@ function EngBot_frame_RightClickMenu_populate(level)
 	elseif (EngBot_RightClickMenu_mode == "mainwindow") then
 		if (level == 1) then
 
-			info = { ["text"] = EBLocal["RightClick_MenuTitle"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+			info = { ["text"] = "Ike3's EngBot @ EngBags", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
 			UIDropDownMenu_AddButton(info, level);
 
 
 			info = { ["disabled"] = 1 };
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Hilight New Items",
-				["value"] = nil,
-				["func"] = EngBot_Button_HighlightToggle_OnClick
-				};
-			if (EngBot_hilight_new == 1) then
-				info["checked"] = 1;
-			end
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Edit Mode",
-				["value"] = nil,
-				["func"] = EngBot_Button_ChangeEditMode_OnClick
-				};
-			if (EngBot_edit_mode == 1) then
-				info["checked"] = 1;
-			end
 			UIDropDownMenu_AddButton(info, level);
 
 			info = {
@@ -2277,102 +2257,6 @@ function EngBot_frame_RightClickMenu_populate(level)
 			if (EngBotConfig["show_top_graphics"] == 1) then
 				info["checked"] = 1;
 			end
-			UIDropDownMenu_AddButton(info, level);
-
-			info = { ["disabled"] = 1 };
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Hide Empty Bag Icons",
-				["value"] = nil,
-				["func"] = function()
-						if (EngBotConfig["hide_bag_icons"] == 0) then
-							EngBotConfig["hide_bag_icons"] = 1;
-						else
-							EngBotConfig["hide_bag_icons"] = 0;
-						end
-
-						EngBot_window_update_required = ENGINVENTORY_MANDATORY;
-						EngBot_UpdateWindow();
-					end
-				};
-			if (EngBotConfig["hide_bag_icons"] == 1) then
-				info["checked"] = 1;
-			end
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Hide Purchase Button",
-				["value"] = nil,
-				["func"] = function()
-						if (EngBotConfig["hide_purchase button"] == 0) then
-							EngBotConfig["hide_purchase button"] = 1;
-							EngBot_SlotCostFrame:Hide();
-							EngBot_PurchaseButton:Hide();
-						else
-							EngBotConfig["hide_purchase button"] = 0;
-							EngBot_SlotCostFrame:Show();
-							EngBot_PurchaseButton:Show();
-						end
-						EngBot_window_update_required = EngBot_REQUIRED;
-						EngBot_UpdateWindow();
-					end
-				};
-			if (EngBotConfig["hide_purchase button"] == 1) then
-				info["checked"] = 1;
-			end
-			UIDropDownMenu_AddButton(info, level);
-
-			info = { ["disabled"] = 1 };
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Reset NEW tag",
-				["value"] = nil,
-				["func"] = function()
-						local bagnum, slotnum, index;
-
-						for index, bagnum in ipairs(EngBot_Bags) do
-							if (EngBotConfig["show_Bag"..bagnum] == 1) then
-								if (table.getn(EngBot_item_cache[bagnum]) > 0) then
-									for slotnum = 1, table.getn(EngBot_item_cache[bagnum]) do
-										EngBot_item_cache[bagnum][slotnum]["indexed_on"] = 1;
-										EngBot_item_cache[bagnum][slotnum]["display_string"] = "NewItemText_Off";
-									end
-								end
-							end
-						end
-
-						EngBot_window_update_required = EngBot_MANDATORY;
-						EngBot_UpdateWindow();
-					end
-				};
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Reload bags",
-				["value"] = nil,
-				["func"] = function()
-						if (EngBot_AtBot==1) then		-- To avoid cleaning the bot cache, u only can reload bags at bot.
-							EngBagsItems[EngBot_PLAYERID] = {};
-							EngBot_window_update_required = EngBot_REQUIRED;
-							EngBot_UpdateWindow();
-							EngBags_Print("Bags reloaded.");
-						end
-					end
-				};
-			UIDropDownMenu_AddButton(info, level);
-
-			info = { ["disabled"] = 1 };
-			UIDropDownMenu_AddButton(info, level);
-
-			info = {
-				["text"] = "Advanced Configuration",
-				["value"] = nil,
-				["func"] = function()
-						EngBot_OptsFrame:Show();
-					end
-				};
 			UIDropDownMenu_AddButton(info, level);
 
 			info = { ["disabled"] = 1 };
