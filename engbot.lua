@@ -946,6 +946,12 @@ function EngBot_Add_item_cache(itemlink)
         return
     end
     
+    local soulbound = false
+    if (string.find(itemlink, "soulbound")) then
+        itemlink = string.sub(itemlink, 0, string.find(itemlink, "soulbound") - 2)
+        soulbound = true
+    end
+    
     local cnt = 1
     if (string.find(itemlink, "|h|rx")) then
         cnt = string.sub(itemlink, string.find(itemlink, "|h|rx") + 5)
@@ -992,6 +998,7 @@ function EngBot_Add_item_cache(itemlink)
         ["sequencial_slot_num"] = slotnum,
         ["bagname"] = "Bot",
         ["iteminfo"] = itemlink,
+        ["soulbound"] = soulbound,
         -- take items from old position
         ["bar"] = EngBot_item_cache[bagnum][slotnum]["bar"],
         ["button_num"] = EngBot_item_cache[bagnum][slotnum]["button_num"],
@@ -1006,9 +1013,6 @@ function EngBot_Add_item_cache(itemlink)
         ["gametooltip"] = EngBot_item_cache[bagnum][slotnum]["gametooltip"]
         };
 
-    if (is_shot_bag) then
-        itm["keywords"]["SHOT_BAG"]=1;
-    end
     
     -- GameTooltip:SetHyperlink(itemlink);
     itm["itemname"], itm["itemlink2"], itm["itemRarity"], itm["itemMinLevel"], itm["itemtype"], itm["itemsubtype"], itm["itemstackcount"], itm["itemloc"], itm["texture"] = GetItemInfo(itemid);
@@ -1020,8 +1024,14 @@ function EngBot_Add_item_cache(itemlink)
     itm["duration"] = 0
     itm["enable"] = 1
     itm["keywords"] = {}
-    itm["itemlink_noninstance"] = 0
-    itm["itemlink_override_key"] = 0
+    itm["itemlink_noninstance"] = itemlink
+    itm["itemlink_override_key"] = itemlink
+    if (is_shot_bag) then
+        itm["keywords"]["SHOT_BAG"]=1;
+    end
+    if (soulbound) then
+        itm["keywords"]["SOULBOUND"] = 1
+    end
     
     if (itm["bar"] == nil) then
         resort_mandatory = 1;
@@ -1117,8 +1127,6 @@ function EngBot_PickBar(itm)
 				["USED_PROJECTILE_SLOT"] = 1,	-- this indicates that the shot bag isn't empty
 				["SHOT_BAG"] = 1
 				};
-		else
-			itm["keywords"] = {};
 		end
 		if (itm["itemRarity"] ~= nil) then
 			itm["keywords"]["ITEMRARITY_"..itm["itemRarity"]] = 1;
