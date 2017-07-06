@@ -30,6 +30,7 @@ EngBot_MANDATORY = 2;	-- it's never been sorted, the window is in an unstable st
 EngBot_resort_required = EngBot_MANDATORY;
 EngBot_window_update_required = EngBot_MANDATORY;
 EngBot_lastItemNum = 1
+EngBot_Mode = "bot_item"
 EngBotConfig = {}
 
 EngBot_BuildTradeList = {};	-- only build a full list of trade skill info once
@@ -42,7 +43,7 @@ EngBot_ConfigOptions_Default = {
 		  ["text"] = "Window Options" },
 	},
 	{},	---------------------------------------------------------------------------------------
-	
+
 	{	-- Window Columns
 		{ ["type"] = "Text", ["ID"] = 1, ["width"] = 0.4, ["color"] = { 1,1,0.25 }, ["text"] = "Columns:" },
 		{ ["type"] = "Text", ["ID"] = 2, ["width"] = 0.1, ["color"] = { 0,1,0.5 }, ["align"] = "right", ["text"] = EngBags_MAXCOLUMNS_MIN },
@@ -433,7 +434,7 @@ function EngBot_CreateConfigOptions()
   ["defaultValue"] = EngBot_Config_GetItemSearchList, ["func"] = EngBot_Config_AssignItemSearchList
 }
 			}  );
-	
+
 	end
 
 end
@@ -533,7 +534,7 @@ if (orig_value == nil) then
 end
 
 
-function EBags_SetDefault(varname, defaultvalue, resetversion, cleanupfunction, cleanup_param1, cleanup_param2)	
+function EBags_SetDefault(varname, defaultvalue, resetversion, cleanupfunction, cleanup_param1, cleanup_param2)
 	local orig_value = EngBagsConfig[varname];
 
 if (orig_value == nil) then
@@ -809,7 +810,7 @@ function EngBot_init()
 	EngBagsItems[EngBot_PLAYERID][2] = {};
 	EngBagsItems[EngBot_PLAYERID][3] = {};
 	EngBagsItems[EngBot_PLAYERID][4] = {};
-	
+
 	-- change imported from auctioneer team..  what does it do?
 	UIPanelWindows["EngBot_frame"] = { area = "left", pushable = 6 };
 
@@ -821,7 +822,7 @@ function EngBot_init()
         SlashCmdList["EngBot"] = EngBot_cmd;
         SLASH_EngBot1 = "/ebinv";
         SLASH_EngBot2 = "/eb";
-	
+
     if ( EngBagsConfig["Bot"] == nil ) then
 		EngBagsConfig["Bot"] = {};
 	end
@@ -832,7 +833,7 @@ function EngBot_init()
 
         -- load default values
         EngBot_SetDefaultValues(0);
-        
+
 	-- go through the tradeskill list, and remove what shouldn't be there
 	-- bah, do it in a lazy way, just wipe it
 	if (EngBagsConfig[EngBot_PLAYERID] == nil) then
@@ -869,6 +870,8 @@ function EngBot_OnEvent(event)
         local message = arg1
         local sender = arg2
         local name = GetUnitName("target")
+        if (message == "=== Bank ===") then EngBot_Mode = "bot_bank_item" end
+        if (message == "=== Inventory ===") then EngBot_Mode = "bot_item" end
         if (sender == name) then
 			EngBot_AtBot = 1;
 			EngBot_resort_required = EngBot_MANDATORY;
@@ -945,13 +948,13 @@ function EngBot_Add_item_cache(itemlink)
     if (not string.find(itemlink, "Hitem")) then
         return
     end
-    
+
     local soulbound = false
     if (string.find(itemlink, "soulbound")) then
         itemlink = string.sub(itemlink, 0, string.find(itemlink, "soulbound") - 2)
         soulbound = true
     end
-    
+
     local cnt = 1
     if (string.find(itemlink, "|h|rx")) then
         cnt = string.sub(itemlink, string.find(itemlink, "|h|rx") + 5)
@@ -959,7 +962,7 @@ function EngBot_Add_item_cache(itemlink)
     end
     local st = string.find(itemlink, "Hitem:");
     local itemid = string.sub(itemlink, st + 6, string.find(itemlink, ":", st + 7) - 1);
-    
+
 	local bag, slot, index;	-- used as "for loop" counters
 	local itm;		-- entry that will be written to the cache
 	local update_suggested = 0;
@@ -975,21 +978,21 @@ function EngBot_Add_item_cache(itemlink)
 
     local bagnum = 1
     local slotnum = EngBot_lastItemNum;
-    
+
     if (EngBot_item_cache[bagnum] == nil) then
         EngBot_item_cache[bagnum] = {}
     end
-    
+
     for index,element in EngBot_item_cache[bagnum] do
         if (element and element["itemid"] == itemid) then
             return
         end
     end
-        
+
     if (EngBot_item_cache[bagnum][slotnum] == nil) then
         EngBot_item_cache[bagnum][slotnum] = {}
     end
-    
+
     itm = {
         ["itemlink"] = itemlink,
         ["itemid"] = itemid,
@@ -1013,7 +1016,7 @@ function EngBot_Add_item_cache(itemlink)
         ["gametooltip"] = EngBot_item_cache[bagnum][slotnum]["gametooltip"]
         };
 
-    
+
     -- GameTooltip:SetHyperlink(itemlink);
     itm["itemname"], itm["itemlink2"], itm["itemRarity"], itm["itemMinLevel"], itm["itemtype"], itm["itemsubtype"], itm["itemstackcount"], itm["itemloc"], itm["texture"] = GetItemInfo(itemid);
     itm["itemcount"] = tonumber(cnt)
@@ -1032,7 +1035,7 @@ function EngBot_Add_item_cache(itemlink)
     if (soulbound) then
         itm["keywords"]["SOULBOUND"] = 1
     end
-    
+
     if (itm["bar"] == nil) then
         resort_mandatory = 1;
     end
@@ -1070,7 +1073,7 @@ function EngBot_Add_item_cache(itemlink)
     if (itm["indexed_on"] == nil) then
         itm["indexed_on"] = 1;
         itm["display_string"] = "NewItemText_Off";
-        
+
     end
 
     EngBot_item_cache[bagnum][slotnum] = itm;	-- save updated information
@@ -1081,7 +1084,7 @@ function EngBot_Add_item_cache(itemlink)
     end
     --EngBot_item_cache[bagnum] = {};
     EngBot_lastItemNum = EngBot_lastItemNum + 1
-    
+
 	if (resort_mandatory == 1) then
 		EngBot_resort_required = EngBot_MANDATORY;
 		EngBot_window_update_required = EngBot_MANDATORY;
@@ -1170,7 +1173,7 @@ function EngBot_PickBar(itm)
 			else
 				EngBot_tt:SetBagItem(itm["bagnum"],itm["slotnum"]);
 		end
-		
+
 		idx = 1;
 		tmptooltip = getglobal("EngBot_ttTextLeft"..idx);
 		tooltip_info_concat = "";
@@ -1220,7 +1223,7 @@ function EngBot_PickBar(itm)
 			for key,value in EngBotConfig["item_search_list"] do
 				if (value[1] ~= "") then
 					local found = 1;
-					
+
 					-- value[1] == catagory to place it in
 
 					-- check keywords
@@ -1314,7 +1317,7 @@ function EngBot_Sort_item_cache()
 			elseif (EngBotConfig["bar_sort_"..barnum] == EngBags_SORTBYNAMEREV) then
 			toggle=2
 		end
-		
+
                 if (toggle==1 or toggle==2) then
                         table.sort(EngBot_bar_positions[barnum],
                                 function(a,b)
@@ -1360,7 +1363,7 @@ function EngBot_UpdateButton(itemframe, itm)
         ic_enable = nil;
 
         SetItemButtonTexture(itemframe, itm["texture"]);
-	
+
         if ( EngBot_edit_mode == 1 ) then
                 -- we should be hilighting an entire class of item
                 if ( itm["barClass"] ~= EngBot_edit_hilight ) then
@@ -1389,7 +1392,7 @@ function EngBot_UpdateButton(itemframe, itm)
                                         EngBotConfig["newItemColor2_G"],
                                         EngBotConfig["newItemColor2_B"], 1 );
                         else
-				
+
                                 -- use color #1
                                 itemframe_stock:SetTextColor(
                                         EngBotConfig["newItemColor1_R"],
@@ -1403,10 +1406,10 @@ function EngBot_UpdateButton(itemframe, itm)
                         itemframe_stock:Show();
                         itemframe_texture:SetVertexColor(1,1,1,1);
 
-                        
+
 		else
                         itemframe_stock:Hide();
-			
+
                         if (EngBot_hilight_new == 1) then
                                 itemframe_texture:SetVertexColor(1,1,1,0.15);
                                 itemframe_font:SetVertexColor(1,1,1,0.5);
@@ -1446,12 +1449,12 @@ function EngBot_UpdateButton(itemframe, itm)
 	itemframe_font:SetTextHeight( EngBags_BUTTONFONTHEIGHT );	-- count, bottomright
 	itemframe_font:ClearAllPoints();
 	itemframe_font:SetPoint("BOTTOMRIGHT", itemframe:GetName(), "BOTTOMRIGHT", 0-EngBot_BUTTONFONTDISTANCE_X, EngBot_BUTTONFONTDISTANCE_Y );
-	
+
 	itemframe_stock.font = "Interface\Addons\EngBags\DAB_CooldownFont.ttf";
 	itemframe_stock:SetTextHeight( EngBags_BUTTONFONTHEIGHT2 );	-- stock, topleft
 	itemframe_stock:ClearAllPoints();
 	itemframe_stock:SetPoint("TOPLEFT", itemframe:GetName(), "TOPLEFT", (EngBot_BUTTONFONTDISTANCE_X / 2), 0-EngBot_BUTTONFONTDISTANCE_Y );
-	
+
         -- Set cooldown
         CooldownFrame_SetTimer(cooldownFrame, ic_start, ic_duration, ic_enable);
         if ( ( ic_duration > 0 ) and ( ic_enable == 0 ) ) then
@@ -1531,7 +1534,7 @@ function EngBot_ItemButton_OnEnter()
 
 
     GameTooltip:SetHyperlink("item:"..itm["itemid"]..":0:0:0:0:0:0:0");
-	
+
 	-- Set Cooldown because BotBag (-1) is broke. Damn you Blizzard.
 	if (itm["enable"] == 1) then
 		itm["start"], itm["duration"], itm["enable"] = GetContainerItemCooldown(itm["bagnum"], itm["slotnum"]);
@@ -1574,12 +1577,12 @@ function EngBot_ItemButton_OnEnter()
                 end
         end
 
-	if itm["bagname"] == nil then 
+	if itm["bagname"] == nil then
 		itm["bagname"] = "Bot";
 	end
 
 	GameTooltip:AddLine("Container::"..itm["bagname"], 1,0,0 );
-		
+
         if ( EngBotConfig["tooltip_mode"] == 1 ) then
 		EngBags_ModifyItemTooltip(itm["bagnum"], itm["slotnum"], "GameTooltip", itm);
 	end
@@ -1631,14 +1634,25 @@ end
 function EngBot_ItemButton_OnClick(button, ignoreShift)
         local bar, position, itm, bagnum, slotnum;
 
-        if (EngBot_buttons[this:GetName()] ~= nil) then
-                bar = EngBot_buttons[this:GetName()]["bar"];
-                position = EngBot_buttons[this:GetName()]["position"];
+        bar = EngBot_buttons[this:GetName()]["bar"];
+        position = EngBot_buttons[this:GetName()]["position"];
 
-		bagnum = EngBot_bar_positions[bar][position]["bagnum"];
-		slotnum = EngBot_bar_positions[bar][position]["slotnum"];
+        bagnum = EngBot_bar_positions[bar][position]["bagnum"];
+        slotnum = EngBot_bar_positions[bar][position]["slotnum"];
 
-                itm = EngBot_item_cache[bagnum][slotnum];
+        itm = EngBot_item_cache[bagnum][slotnum];
+
+        print("EngBot_ItemButton_OnClick"..itm["itemlink"]);
+        if ( button == "RightButton" ) then
+            HideDropDownMenu(1);
+            EngBot_RightClickMenu_mode = EngBot_Mode;
+            EngBot_RightClickMenu_opts = {
+                ["bar"] = bar,
+                ["position"] = position,
+                ["bagnum"] = bagnum,
+                ["slotnum"] = slotnum
+                };
+            ToggleDropDownMenu(1, nil, EngBot_frame_RightClickMenu, this:GetName(), -50, 0);
         end
 
         if (EngBot_edit_mode == 1) then
@@ -1720,7 +1734,7 @@ function EngBot_ItemButton_OnClick(button, ignoreShift)
                                         else
                                                 UseContainerItem(itm["bagnum"], itm["slotnum"]);
                                         end
-                                else 
+                                else
                                         if ( IsShiftKeyDown() and MerchantFrame:IsVisible() and not ignoreShift ) then
                                                 this.SplitStack = function(button, split)
 							local bar, position, bagnum, slotnum;
@@ -1978,11 +1992,81 @@ function EngBot_RightClick_SetItemOverride()
 	end
 end
 
+function EngBot_RightClick_Whisper()
+    local bagnum, slotnum, itm, command;
+
+    bagnum = this.value["bagnum"];
+    slotnum = this.value["slotnum"];
+    command = this.value["command"];
+
+    if ( (bagnum ~= nil) and (slotnum ~= nil) ) then
+        itm = EngBot_item_cache[bagnum][slotnum];
+        SendChatMessage(command..itm["itemlink"], "WHISPER", nil, GetUnitName("target"))
+    end
+end
+
 function EngBot_frame_RightClickMenu_populate(level)
 	local bar, position, bagnum, slotnum;
 	local info, itm, barclass, tmp, checked, i;
 	local key, value, key2, value2;
 
+
+    print("EngBot_RightClickMenu_mode="..EngBot_RightClickMenu_mode)
+	-------------------------------------------------------------------------------------------------
+	------------------------------- BOT ITEM CONTEXT MENU -----------------------------------------------
+	-------------------------------------------------------------------------------------------------
+	if (EngBot_RightClickMenu_mode == "bot_item") then
+		-- we have a right click on a button
+
+		bar = EngBot_RightClickMenu_opts["bar"];
+		position = EngBot_RightClickMenu_opts["position"];
+		bagnum = EngBot_bar_positions[bar][position]["bagnum"];
+		slotnum = EngBot_bar_positions[bar][position]["slotnum"];
+		itm = EngBot_item_cache[bagnum][slotnum];
+
+        info = {
+            ["text"] = "Add/Remove Trade",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="t " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Put to bank",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="bank " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Send by mail",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="sendmail " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+	end
+
+    -------------------------------------------------------------------------------------------------
+    ------------------------------- BOT BANK ITEM CONTEXT MENU -----------------------------------------------
+    -------------------------------------------------------------------------------------------------
+    if (EngBot_RightClickMenu_mode == "bot_bank_item") then
+        -- we have a right click on a button
+
+        bar = EngBot_RightClickMenu_opts["bar"];
+        position = EngBot_RightClickMenu_opts["position"];
+        bagnum = EngBot_bar_positions[bar][position]["bagnum"];
+        slotnum = EngBot_bar_positions[bar][position]["slotnum"];
+        itm = EngBot_item_cache[bagnum][slotnum];
+
+        info = {
+            ["text"] = "Get from bank",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="bank -" },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+    end
 
 	-------------------------------------------------------------------------------------------------
 	------------------------------- ITEM CONTEXT MENU -----------------------------------------------
@@ -2141,7 +2225,7 @@ function EngBot_frame_RightClickMenu_populate(level)
 			[EngBags_SORTBYNAME] = "Sort by name",
 			[EngBags_SORTBYNAMEREV] = "Sort last words first"
 			} do
-	
+
 			if (EngBotConfig["bar_sort_"..bar] == key) then
 				checked = 1;
 			else
@@ -2153,7 +2237,7 @@ function EngBot_frame_RightClickMenu_populate(level)
 				["func"] = function()
 						EngBotConfig["bar_sort_"..(this.value["bar"])] = (this.value["sortmode"]);
 						EngBot_resort_required = EngBot_MANDATORY;
-						EngBot_UpdateWindow();			
+						EngBot_UpdateWindow();
 					end,
 				["checked"] = checked
 				};
@@ -2270,7 +2354,7 @@ function EngBot_frame_RightClickMenu_populate(level)
 			info = { ["disabled"] = 1 };
 			UIDropDownMenu_AddButton(info, level);
 
-			
+
 			info = {
 				["text"] = "Set button size";
 				["value"] = { ["opt"]="set_button_size" },
@@ -2280,7 +2364,7 @@ function EngBot_frame_RightClickMenu_populate(level)
 
 			info = { ["disabled"] = 1 };
 			UIDropDownMenu_AddButton(info, level);
-			
+
 
 			info = {
 				["text"] = "Background Color",
@@ -2442,7 +2526,7 @@ function EngBot_AssignButtonsToFrame(barnum, currentbutton, frame, width, height
                         EngBags_BUTTONFRAME_Y_PADDING,
                         EngBags_BKGRFRAME_WIDTH,
                         EngBags_BKGRFRAME_HEIGHT );
-                
+
                 tmpframe = getglobal("EngBot_frame_SlotTarget_"..barnum.."_BigText");
                 tmpframe:SetText( barnum );
                 tmpframe:Show();
@@ -2458,7 +2542,7 @@ EngBot_WindowIsUpdating = 0;
 
 function EngBot_UpdateWindow()
         local frame = getglobal("EngBot_frame");
-        
+
         local currentbutton, barnum, slotnum;
         local barframe_one, barframe_two, barframe_three, tmpframe;
         local calc_dat, tmpcalc, cur_y;
@@ -2520,8 +2604,8 @@ function EngBot_UpdateWindow()
 				end
 			end
 			--calc_dat["total_in_row"] = calc_dat["first"] + calc_dat["second"] + calc_dat["third"];
-  			
-    			for index,element in ipairs(EngBags_Bars) do 
+
+    			for index,element in ipairs(EngBags_Bars) do
 				calc_dat[element.."_heighttable"] = {};
 				if calc_dat[element] > 0 then
 					for tmpcalc = 1, calc_dat[element] do
@@ -2676,7 +2760,7 @@ function EngBot_UpdateWindow()
 
 		local new_width = (EngBotConfig["maxColumns"]*EngBags_BUTTONFRAME_WIDTH) + (10*EngBotConfig["frameXSpace"]);
 		local new_height;
-		
+
 		if (EngBotConfig["show_top_graphics"] == 1) then
 			new_height = cur_y + EngBot_TOP_PADWINDOW;
 		else
