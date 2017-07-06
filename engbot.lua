@@ -2058,6 +2058,9 @@ function EngBot_frame_RightClickMenu_populate(level)
         };
         UIDropDownMenu_AddButton(info, level);
 
+        info = { ["disabled"] = 1 };
+        UIDropDownMenu_AddButton(info, level);
+
         info = {
             ["text"] = "Put to bank",
             ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="bank " },
@@ -2068,6 +2071,23 @@ function EngBot_frame_RightClickMenu_populate(level)
         info = {
             ["text"] = "Send by mail",
             ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="sendmail " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = { ["disabled"] = 1 };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Equip",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="e " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Use",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="u " },
             ["func"] = EngBot_RightClick_Whisper
         };
         UIDropDownMenu_AddButton(info, level);
