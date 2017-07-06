@@ -1658,7 +1658,6 @@ function EngBot_ItemButton_OnClick(button, ignoreShift)
 
         itm = EngBot_item_cache[bagnum][slotnum];
 
-        print("EngBot_ItemButton_OnClick"..itm["itemlink"]);
         if ( button == "RightButton" ) then
             HideDropDownMenu(1);
             EngBot_RightClickMenu_mode = EngBot_Mode;
@@ -2017,10 +2016,15 @@ function EngBot_RightClick_Whisper()
 
     if ( (bagnum ~= nil) and (slotnum ~= nil) ) then
         itm = EngBot_item_cache[bagnum][slotnum];
-        SendChatMessage(command..itm["itemlink"], "WHISPER", nil, GetUnitName("target"))
-        local query = "c"
-        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
-        wait(2, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
+        if (command == "t ") then
+            InitiateTrade("target")
+            wait(1, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"])
+        else
+            SendChatMessage(command..itm["itemlink"], "WHISPER", nil, GetUnitName("target"));
+            local query = "c"
+            if (EngBot_Mode == "bot_bank_item") then query = "bank" end
+            wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
+        end
     end
 end
 
@@ -2030,7 +2034,6 @@ function EngBot_frame_RightClickMenu_populate(level)
 	local key, value, key2, value2;
 
 
-    print("EngBot_RightClickMenu_mode="..EngBot_RightClickMenu_mode)
 	-------------------------------------------------------------------------------------------------
 	------------------------------- BOT ITEM CONTEXT MENU -----------------------------------------------
 	-------------------------------------------------------------------------------------------------
