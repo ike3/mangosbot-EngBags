@@ -870,8 +870,20 @@ function EngBot_OnEvent(event)
         local message = arg1
         local sender = arg2
         local name = GetUnitName("target")
-        if (message == "=== Bank ===") then EngBot_Mode = "bot_bank_item" end
-        if (message == "=== Inventory ===") then EngBot_Mode = "bot_item" end
+        if (message == "=== Bank ===") then
+            EngBot_Mode = "bot_bank_item"
+            EngBot_AtBot = 0;
+            EngBot_frame:Hide();
+            EngBot_lastItemNum = 1
+            EngBagsItems[EngBot_PLAYERID] = {}
+        end
+        if (message == "=== Inventory ===") then
+            EngBot_Mode = "bot_item"
+            EngBot_AtBot = 0;
+            EngBot_frame:Hide();
+            EngBot_lastItemNum = 1
+            EngBagsItems[EngBot_PLAYERID] = {}
+        end
         if (sender == name) then
 			EngBot_AtBot = 1;
 			EngBot_resort_required = EngBot_MANDATORY;
@@ -2002,6 +2014,9 @@ function EngBot_RightClick_Whisper()
     if ( (bagnum ~= nil) and (slotnum ~= nil) ) then
         itm = EngBot_item_cache[bagnum][slotnum];
         SendChatMessage(command..itm["itemlink"], "WHISPER", nil, GetUnitName("target"))
+        local query = "c"
+        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
+        wait(2, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
     end
 end
 
@@ -2843,4 +2858,33 @@ function EngBot_UpdateWindow()
 	EngBot_window_update_required = EngBot_NOTNEEDED;
 
         EngBot_WindowIsUpdating = 0;
+end
+
+function wait(delay, func, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+  if(type(delay)~="number" or type(func)~="function") then
+    return false;
+  end
+  if(waitFrame == nil) then
+    waitFrame = CreateFrame("Frame","WaitFrame", UIParent);
+    waitFrame:SetScript("OnUpdate",function ()
+      local elapse = 0.1
+      local count = tablelength(waitTable);
+      local i = 1;
+      while(i<=count) do
+        local waitRecord = tremove(waitTable,i);
+        local d = tremove(waitRecord,1);
+        local f = tremove(waitRecord,1);
+        local p = tremove(waitRecord,1);
+        if(d>elapse) then
+          tinsert(waitTable,i,{d-elapse,f,p});
+          i = i + 1;
+        else
+          count = count - 1;
+          f(unpack(p));
+        end
+      end
+    end);
+  end
+  tinsert(waitTable,{delay,func,{arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9}});
+  return true;
 end
