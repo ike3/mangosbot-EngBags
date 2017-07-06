@@ -1,11 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 	<Script file="default_items.lua"/>
 	<Script file="tooltip.lua"/>
-	<Script file="support_funcs.lua"/> 
+	<Script file="support_funcs.lua"/>
 	<Script file="engbags.lua"/>
 	<Script file="eb_config.lua"/>
-	<Script file="chat_cmd_handler.lua"/> 
-	<Script file="engbot.lua"/> 
+	<Script file="chat_cmd_handler.lua"/>
+	<Script file="engbot.lua"/>
 	<Script file="hooks.lua"/>
 	<Script file="localization.lua"/>
 	<Script file="engcrafts.lua"/>
@@ -39,7 +39,7 @@
 		<Anchors>
 			<Anchor point="TOPLEFT"/>
 		</Anchors>
-	</Texture>	
+	</Texture>
 
 	<Button name="EngBot_ItemButtonTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
 		<Size>
@@ -142,7 +142,7 @@
 		</Scripts>
 	</Button>
 
-	<Frame name="EngBot_frame_bar_Template" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true"> 
+	<Frame name="EngBot_frame_bar_Template" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
 		<Size><AbsDimension x="200" y="46"/></Size>
 		<Anchors>
 			<Anchor point="BOTTOMRIGHT">
@@ -165,7 +165,7 @@
 		</Backdrop>
 	</Frame>
 
-	<Frame name="EngBot_frame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent"> 
+	<Frame name="EngBot_frame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent">
 		<Size><AbsDimension x="500" y="500"/></Size>
 		<Anchors>
 			<Anchor point="BOTTOMRIGHT">
@@ -199,7 +199,7 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
-							
+
 				<Texture name="$parentTextureTopLeft" file="Interface\AddOns\EngBags\Skin\EngTopLeft" hidden="true">
 					<Size>
 						<AbsDimension x="128" y="128"/>
@@ -215,7 +215,7 @@
 						<AbsDimension x="64" y="128"/>
 					</Size>
 					<Anchors>
-						<Anchor point="TOPRIGHT"> 
+						<Anchor point="TOPRIGHT">
 							<Offset><AbsDimension x="36" y="60"/></Offset>
 						</Anchor>
 					</Anchors>
@@ -245,7 +245,7 @@
 						<AbsDimension x="64" y="128"/>
 					</Size>
 					<Anchors>
-						<Anchor point="BOTTOMRIGHT"> 
+						<Anchor point="BOTTOMRIGHT">
 							<Offset><AbsDimension x="36" y="-60"/></Offset>
 						</Anchor>
 					</Anchors>
@@ -726,24 +726,24 @@
 				</Scripts>
 			</Frame>
 
-			<Frame name="EngBot_frame_bar_1" inherits="EngBot_frame_bar_Template"/> 
-			<Frame name="EngBot_frame_bar_2" inherits="EngBot_frame_bar_Template"/> 
+			<Frame name="EngBot_frame_bar_1" inherits="EngBot_frame_bar_Template"/>
+			<Frame name="EngBot_frame_bar_2" inherits="EngBot_frame_bar_Template"/>
 			<Frame name="EngBot_frame_bar_3" inherits="EngBot_frame_bar_Template"/>
 
-			<Frame name="EngBot_frame_bar_4" inherits="EngBot_frame_bar_Template"/> 
-			<Frame name="EngBot_frame_bar_5" inherits="EngBot_frame_bar_Template"/> 
-			<Frame name="EngBot_frame_bar_6" inherits="EngBot_frame_bar_Template"/> 
+			<Frame name="EngBot_frame_bar_4" inherits="EngBot_frame_bar_Template"/>
+			<Frame name="EngBot_frame_bar_5" inherits="EngBot_frame_bar_Template"/>
+			<Frame name="EngBot_frame_bar_6" inherits="EngBot_frame_bar_Template"/>
 
 			<Frame name="EngBot_frame_bar_7" inherits="EngBot_frame_bar_Template"/>
-			<Frame name="EngBot_frame_bar_8" inherits="EngBot_frame_bar_Template"/> 
+			<Frame name="EngBot_frame_bar_8" inherits="EngBot_frame_bar_Template"/>
 			<Frame name="EngBot_frame_bar_9" inherits="EngBot_frame_bar_Template"/>
 
-			<Frame name="EngBot_frame_bar_10" inherits="EngBot_frame_bar_Template"/> 
-			<Frame name="EngBot_frame_bar_11" inherits="EngBot_frame_bar_Template"/> 
+			<Frame name="EngBot_frame_bar_10" inherits="EngBot_frame_bar_Template"/>
+			<Frame name="EngBot_frame_bar_11" inherits="EngBot_frame_bar_Template"/>
 			<Frame name="EngBot_frame_bar_12" inherits="EngBot_frame_bar_Template"/>
 
-			<Frame name="EngBot_frame_bar_13" inherits="EngBot_frame_bar_Template"/> 
-			<Frame name="EngBot_frame_bar_14" inherits="EngBot_frame_bar_Template"/> 
+			<Frame name="EngBot_frame_bar_13" inherits="EngBot_frame_bar_Template"/>
+			<Frame name="EngBot_frame_bar_14" inherits="EngBot_frame_bar_Template"/>
 			<Frame name="EngBot_frame_bar_15" inherits="EngBot_frame_bar_Template"/>
 
 			<Button name="EngBot_frame_SlotTarget_1" inherits="EngBot_SlotTargetTemplate"/>
@@ -922,18 +922,20 @@
 		</Frames>
 
 		<Scripts>
-			<OnLoad> 
-				this:RegisterEvent("VARIABLES_LOADED"); 
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
 				this:RegisterEvent("CHAT_MSG_WHISPER");
 				this:RegisterEvent("PLAYER_TARGET_CHANGED");
-			</OnLoad> 
-			<OnEvent> 
-				if (event == "VARIABLES_LOADED") then 
+				this:RegisterEvent("TRADE_CLOSED");
+				this:RegisterEvent("TRADE_UPDATE");
+			</OnLoad>
+			<OnEvent>
+				if (event == "VARIABLES_LOADED") then
 					EngBot_init();
 				else
 					EngBot_OnEvent(event);
 				end
-			</OnEvent> 
+			</OnEvent>
 			<OnMouseDown>
 				EngBot_OnMouseDown(arg1, this);
 			</OnMouseDown>

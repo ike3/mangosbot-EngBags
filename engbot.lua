@@ -904,6 +904,11 @@ function EngBot_OnEvent(event)
                 end
             end
 		end
+	elseif (event == "TRADE_CLOSED" or event == "TRADE_UPDATE") then
+        local name = GetUnitName("target")
+        local query = "c"
+        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
+        wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
 	elseif (event == "PLAYER_TARGET_CHANGED") then
         local name = GetUnitName("target")
         if (name ~= EngBot_PlayerName) then
