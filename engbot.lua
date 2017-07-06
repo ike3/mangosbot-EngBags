@@ -2369,6 +2369,16 @@ function EngBot_frame_RightClickMenu_populate(level)
 			info = { ["disabled"] = 1 };
 			UIDropDownMenu_AddButton(info, level);
 
+			info = {
+				["text"] = "Reload",
+				["value"] = nil,
+				["func"] = function()
+                        local query = "c"
+                        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
+                        SendChatMessage(query, "WHISPER", nil, GetUnitName("target"))
+					end
+				};
+			UIDropDownMenu_AddButton(info, level);
 
 			info = {
 				["text"] = "Set button size";
