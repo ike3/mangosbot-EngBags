@@ -888,7 +888,11 @@ function EngBot_OnEvent(event)
 			EngBot_AtBot = 1;
 			EngBot_resort_required = EngBot_MANDATORY;
 			EngBot_edit_mode = 0;
-			EngBotFrameTitleText:SetText(UnitName("npc"));
+			if (EngBot_Mode == "bot_item") then
+	   		    EngBotFrameTitleText:SetText(name.. "'s Inventory")
+			else
+                EngBotFrameTitleText:SetText(name.. "'s Bank")
+			end
 			SetPortraitTexture(EngBot_framePortrait, "npc");
             EngBot_PlayerName = sender;
             EngBot_Add_item_cache(message);
