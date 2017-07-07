@@ -1673,6 +1673,7 @@ function EngBot_ItemButton_OnClick(button, ignoreShift)
                 ["slotnum"] = slotnum
                 };
             ToggleDropDownMenu(1, nil, EngBot_frame_RightClickMenu, this:GetName(), -50, 0);
+            return
         end
 
         if (EngBot_edit_mode == 1) then
