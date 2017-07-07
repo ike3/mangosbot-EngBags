@@ -865,24 +865,27 @@ function EngBot_init()
 
 end
 
+function EngBot_ClearForMode(mode)
+    EngBot_Mode = mode
+    EngBot_AtBot = 0;
+    EngBot_frame:Hide();
+    EngBot_lastItemNum = 1
+    EngBagsItems[EngBot_PLAYERID] = {}
+end
+
 function EngBot_OnEvent(event)
 	if (event == "CHAT_MSG_WHISPER") then
         local message = arg1
         local sender = arg2
         local name = GetUnitName("target")
         if (message == "=== Bank ===") then
-            EngBot_Mode = "bot_bank_item"
-            EngBot_AtBot = 0;
-            EngBot_frame:Hide();
-            EngBot_lastItemNum = 1
-            EngBagsItems[EngBot_PLAYERID] = {}
+            EngBot_ClearForMode("bot_bank_item")
         end
         if (message == "=== Inventory ===") then
-            EngBot_Mode = "bot_item"
-            EngBot_AtBot = 0;
-            EngBot_frame:Hide();
-            EngBot_lastItemNum = 1
-            EngBagsItems[EngBot_PLAYERID] = {}
+            EngBot_ClearForMode("bot_item")
+        end
+        if (message == "=== Mailbox ===") then
+            EngBot_ClearForMode("bot_mail_item")
         end
         if (sender == name) then
 			EngBot_AtBot = 1;
@@ -890,6 +893,8 @@ function EngBot_OnEvent(event)
 			EngBot_edit_mode = 0;
 			if (EngBot_Mode == "bot_item") then
 	   		    EngBotFrameTitleText:SetText(name.. "'s Inventory")
+            elseif (EngBot_Mode == "bot_mail_item") then
+                EngBotFrameTitleText:SetText(name.. "'s Mail")
 			else
                 EngBotFrameTitleText:SetText(name.. "'s Bank")
 			end
