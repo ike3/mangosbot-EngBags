@@ -873,6 +873,16 @@ function EngBot_ClearForMode(mode)
     EngBagsItems[EngBot_PLAYERID] = {}
 end
 
+function EngBot_GetReloadQuery()
+    local query = "c"
+    if (EngBot_Mode == "bot_bank_item") then
+        query = "bank";
+    elseif (EngBot_Mode == "bot_mail_item") then
+        query = "mail ?";
+    end
+    return query
+end
+
 function EngBot_OnEvent(event)
 	if (event == "CHAT_MSG_WHISPER") then
         local message = arg1
@@ -911,9 +921,7 @@ function EngBot_OnEvent(event)
 		end
 	elseif (event == "TRADE_CLOSED" or event == "TRADE_UPDATE") then
         local name = GetUnitName("target")
-        local query = "c"
-        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
-        wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
+        wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
 	elseif (event == "PLAYER_TARGET_CHANGED") then
         local name = GetUnitName("target")
         if (name ~= EngBot_PlayerName) then
@@ -981,9 +989,18 @@ function EngBot_Add_item_cache(itemlink)
         soulbound = true
     end
 
+    local mailIndex = "0"
+    if (string.find(itemlink, "#") == 1) then
+        mailIndex = string.sub(itemlink, 2, string.find(itemlink, " "));
+        itemlink = string.sub(itemlink, string.find(itemlink, " ") + 1)
+    end
+
     local cnt = 1
     if (string.find(itemlink, "|h|rx")) then
         cnt = string.sub(itemlink, string.find(itemlink, "|h|rx") + 5)
+        if (string.find(cnt, " ")) then
+            cnt = string.sub(cnt, 0, string.find(cnt, " "))
+        end
         itemlink = string.sub(itemlink, 0, string.find(itemlink, "|h|rx") + 3)
     end
     local st = string.find(itemlink, "Hitem:");
@@ -1028,6 +1045,7 @@ function EngBot_Add_item_cache(itemlink)
         ["bagname"] = "Bot",
         ["iteminfo"] = itemlink,
         ["soulbound"] = soulbound,
+        ["mailIndex"] = mailIndex,
         -- take items from old position
         ["bar"] = EngBot_item_cache[bagnum][slotnum]["bar"],
         ["button_num"] = EngBot_item_cache[bagnum][slotnum]["button_num"],
@@ -2031,10 +2049,10 @@ function EngBot_RightClick_Whisper()
             InitiateTrade("target")
             wait(1, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"])
         else
-            SendChatMessage(command..itm["itemlink"], "WHISPER", nil, GetUnitName("target"));
-            local query = "c"
-            if (EngBot_Mode == "bot_bank_item") then query = "bank" end
-            wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, query)
+            local cmd = command..itm["itemlink"]
+            if (itm["mailIndex"] ~= "0") then cmd = command..itm["mailIndex"] end
+            SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target"));
+            wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
         end
     end
 end
@@ -2115,6 +2133,27 @@ function EngBot_frame_RightClickMenu_populate(level)
         info = {
             ["text"] = "Get from bank",
             ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="bank -" },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+    end
+
+    -------------------------------------------------------------------------------------------------
+    ------------------------------- BOT MAIL ITEM CONTEXT MENU -----------------------------------------------
+    -------------------------------------------------------------------------------------------------
+    if (EngBot_RightClickMenu_mode == "bot_mail_item") then
+        -- we have a right click on a button
+
+        bar = EngBot_RightClickMenu_opts["bar"];
+        position = EngBot_RightClickMenu_opts["position"];
+        bagnum = EngBot_bar_positions[bar][position]["bagnum"];
+        slotnum = EngBot_bar_positions[bar][position]["slotnum"];
+        itm = EngBot_item_cache[bagnum][slotnum];
+
+        info = {
+            ["text"] = "Take",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="mail take " },
             ["func"] = EngBot_RightClick_Whisper
         };
         UIDropDownMenu_AddButton(info, level);
@@ -2411,9 +2450,7 @@ function EngBot_frame_RightClickMenu_populate(level)
 				["text"] = "Reload",
 				["value"] = nil,
 				["func"] = function()
-                        local query = "c"
-                        if (EngBot_Mode == "bot_bank_item") then query = "bank" end
-                        SendChatMessage(query, "WHISPER", nil, GetUnitName("target"))
+                        SendChatMessage(EngBot_GetReloadQuery(), "WHISPER", nil, GetUnitName("target"))
 					end
 				};
 			UIDropDownMenu_AddButton(info, level);
