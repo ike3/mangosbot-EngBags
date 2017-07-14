@@ -2116,6 +2116,23 @@ function EngBot_frame_RightClickMenu_populate(level)
         };
         UIDropDownMenu_AddButton(info, level);
 
+        info = { ["disabled"] = 1 };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Sell",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="s " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Destroy",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="destroy " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
 	end
 
     -------------------------------------------------------------------------------------------------
