@@ -879,6 +879,8 @@ function EngBot_GetReloadQuery()
         query = "bank";
     elseif (EngBot_Mode == "bot_mail_item") then
         query = "mail ?";
+    elseif (EngBot_Mode == "bot_spell_item") then
+        query = "spells";
     end
     return query
 end
@@ -890,12 +892,12 @@ function EngBot_OnEvent(event)
         local name = GetUnitName("target")
         if (message == "=== Bank ===") then
             EngBot_ClearForMode("bot_bank_item")
-        end
-        if (message == "=== Inventory ===") then
+        elseif (message == "=== Inventory ===") then
             EngBot_ClearForMode("bot_item")
-        end
-        if (message == "=== Mailbox ===") then
+        elseif (message == "=== Mailbox ===") then
             EngBot_ClearForMode("bot_mail_item")
+        elseif (message == "=== Spells ===") then
+            EngBot_ClearForMode("bot_spell_item")
         end
         if (sender == name) then
 			EngBot_AtBot = 1;
@@ -905,6 +907,8 @@ function EngBot_OnEvent(event)
 	   		    EngBotFrameTitleText:SetText(name.. "'s Inventory")
             elseif (EngBot_Mode == "bot_mail_item") then
                 EngBotFrameTitleText:SetText(name.. "'s Mail")
+            elseif (EngBot_Mode == "bot_spell_item") then
+                EngBotFrameTitleText:SetText(name.. "'s Tradeskill")
 			else
                 EngBotFrameTitleText:SetText(name.. "'s Bank")
 			end
@@ -990,20 +994,35 @@ function EngBot_Add_item_cache(itemlink)
     end
 
     local mailIndex = "0"
-    if (string.find(itemlink, "#") == 1) then
+    if (EngBot_Mode == "bot_mail_item" and string.find(itemlink, "#") == 1) then
         mailIndex = string.sub(itemlink, 2, string.find(itemlink, " "));
         itemlink = string.sub(itemlink, string.find(itemlink, " ") + 1)
     end
 
     local cnt = 1
-    if (string.find(itemlink, "|h|rx")) then
-        cnt = string.sub(itemlink, string.find(itemlink, "|h|rx") + 5)
-        if (string.find(cnt, " ")) then
-            cnt = string.sub(cnt, 0, string.find(cnt, " "))
+    if (EngBot_Mode == "bot_spell_item") then
+        if (string.find(itemlink, "|h|r")) then
+            itemlink = string.sub(itemlink, 0, string.find(itemlink, "|h|r") + 3)
         end
-        itemlink = string.sub(itemlink, 0, string.find(itemlink, "|h|rx") + 3)
+        if (string.find(itemlink, "%(x")) then
+            cnt = string.sub(itemlink, string.find(itemlink, "%(x") + 2, string.find(itemlink, "%)") - 1)
+            itemlink = string.sub(itemlink, string.find(itemlink, "%)") + 2)
+        end
+    else
+        if (string.find(itemlink, "|h|rx")) then
+            cnt = string.sub(itemlink, string.find(itemlink, "|h|rx") + 5)
+            if (string.find(cnt, " ")) then
+                cnt = string.sub(cnt, 0, string.find(cnt, " "))
+            end
+            itemlink = string.sub(itemlink, 0, string.find(itemlink, "|h|rx") + 3)
+        end
     end
+
     local st = string.find(itemlink, "Hitem:");
+    if (not st) then
+        return
+    end
+
     local itemid = string.sub(itemlink, st + 6, string.find(itemlink, ":", st + 7) - 1);
 
 	local bag, slot, index;	-- used as "for loop" counters
@@ -2052,7 +2071,9 @@ function EngBot_RightClick_Whisper()
             local cmd = command..itm["itemlink"]
             if (itm["mailIndex"] ~= "0") then cmd = command..itm["mailIndex"] end
             SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target"));
-            wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
+            if (command ~= "cast ") then
+                wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
+            end
         end
     end
 end
@@ -2171,6 +2192,27 @@ function EngBot_frame_RightClickMenu_populate(level)
         info = {
             ["text"] = "Take",
             ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="mail take " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+    end
+
+    -------------------------------------------------------------------------------------------------
+    ------------------------------- BOT SPELL ITEM CONTEXT MENU -----------------------------------------------
+    -------------------------------------------------------------------------------------------------
+    if (EngBot_RightClickMenu_mode == "bot_spell_item") then
+        -- we have a right click on a button
+
+        bar = EngBot_RightClickMenu_opts["bar"];
+        position = EngBot_RightClickMenu_opts["position"];
+        bagnum = EngBot_bar_positions[bar][position]["bagnum"];
+        slotnum = EngBot_bar_positions[bar][position]["slotnum"];
+        itm = EngBot_item_cache[bagnum][slotnum];
+
+        info = {
+            ["text"] = "Craft",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="cast " },
             ["func"] = EngBot_RightClick_Whisper
         };
         UIDropDownMenu_AddButton(info, level);
