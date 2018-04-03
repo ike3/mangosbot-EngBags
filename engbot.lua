@@ -1006,7 +1006,7 @@ function EngBot_Add_item_cache(itemlink)
         end
         if (string.find(itemlink, "%(x")) then
             cnt = string.sub(itemlink, string.find(itemlink, "%(x") + 2, string.find(itemlink, "%)") - 1)
-            itemlink = string.sub(itemlink, string.find(itemlink, "%)") + 2)
+            itemlink = string.sub(itemlink, string.find(itemlink, "%)") + 4)
         end
     else
         if (string.find(itemlink, "|h|rx")) then
