@@ -1,11 +1,13 @@
-## Interface: 11200
-## Title: |cFF990099Eng|cFF006699Bags
+## Interface: 30000
+## Title: |CFFFF0000EngBags Continued
 ## Notes: AutoSorting Bags
-## RequiredDeps: 
-## OptionalDeps: lootlink, auctioneer, equipcompare
+## Authors: UniRing
+## Patched By: Requital
+## RequiredDeps:
+## OptionalDeps: lootlink, auctioneer, equipcompare, FluidFrames
 ## SavedVariables: EngBagsItems, EngBagsConfig
 ## SavedVariablesPerCharacter:
-## Dependencies: 
+## Dependencies:
 EngBank.xml
 EngBot.xml
 eb_options.xml
