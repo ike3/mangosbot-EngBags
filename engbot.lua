@@ -2006,8 +2006,15 @@ function EngBot_frame_RightClickMenu_populate(level)
         itm = EngBot_item_cache[bagnum][slotnum];
 
         info = {
-            ["text"] = "Add/Remove Trade",
-            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="t " },
+            ["text"] = "Add/Remove Trade (1)",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="t ", ["param"]="" },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
+            ["text"] = "Add/Remove Trade (All)",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="t ", ["param"]=" 6" },
             ["func"] = EngBot_RightClick_Whisper
         };
         UIDropDownMenu_AddButton(info, level);
@@ -3518,17 +3525,18 @@ function EngBot_Add_item_cache(itemlink)
 end
 
 function EngBot_RightClick_Whisper()
-    local bagnum, slotnum, itm, command;
+    local bagnum, slotnum, itm, command, param;
 
     bagnum = this.value["bagnum"];
     slotnum = this.value["slotnum"];
     command = this.value["command"];
+    param = this.value["param"];
 
     if ( (bagnum ~= nil) and (slotnum ~= nil) ) then
         itm = EngBot_item_cache[bagnum][slotnum];
         if (command == "t ") then
             InitiateTrade("target")
-            wait(1, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"])
+            wait(1, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"]..param)
         else
             local cmd = command..itm["itemlink"]
             if (itm["mailIndex"] ~= "0") then cmd = command..itm["mailIndex"] end
