@@ -915,7 +915,7 @@ function EngBot_OnEvent(event)
 			SetPortraitTexture(EngBot_framePortrait, "npc");
             EngBot_PlayerName = sender;
             EngBot_Add_item_cache(message);
-            EngBot_UpdateWindow();
+            wait(1, function() EngBot_UpdateWindow() end);
             if (EngBagsItems[EngBot_PLAYERID][1]) then
                 for index,el in EngBagsItems[EngBot_PLAYERID][1] do
                     EngBot_frame:Show();
