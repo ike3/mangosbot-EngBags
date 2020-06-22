@@ -3309,7 +3309,7 @@ function EngBot_OnEvent(event)
             SetPortraitTexture(EngBot_framePortrait, "npc");
             EngBot_PlayerName = sender;
             EngBot_Add_item_cache(message);
-            EngBot_UpdateWindow();
+            wait(1, function() EngBot_UpdateWindow() end);
             if (EngBagsItems[EngBot_PLAYERID][1]) then
                 for index,el in ipairs(EngBagsItems[EngBot_PLAYERID][1]) do
                     EngBot_frame:Show();
@@ -3329,7 +3329,7 @@ function EngBot_OnEvent(event)
             EngBagsItems[EngBot_PLAYERID] = {}
         end
         EngBot_window_update_required = EngBot_MANDATORY;
-        EngBot_UpdateWindow();
+        wait(1, function() EngBot_UpdateWindow() end);
 
     end
 
