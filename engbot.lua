@@ -898,6 +898,8 @@ function EngBot_OnEvent(event)
             EngBot_ClearForMode("bot_mail_item")
         elseif (message == "=== Spells ===") then
             EngBot_ClearForMode("bot_spell_item")
+        elseif (message == "=== Equip ===") then
+            EngBot_ClearForMode("bot_item")
         end
         if (sender == name) then
 			EngBot_AtBot = 1;
