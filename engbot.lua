@@ -917,7 +917,7 @@ function EngBot_OnEvent(event)
 			SetPortraitTexture(EngBot_framePortrait, "npc");
             EngBot_PlayerName = sender;
             EngBot_Add_item_cache(message);
-            wait(1, function() EngBot_UpdateWindow() end);
+            wait(2, function() EngBot_UpdateWindow() end);
             if (EngBagsItems[EngBot_PLAYERID][1]) then
                 for index,el in EngBagsItems[EngBot_PLAYERID][1] do
                     EngBot_frame:Show();
@@ -927,7 +927,7 @@ function EngBot_OnEvent(event)
 		end
 	elseif (event == "TRADE_CLOSED" or event == "TRADE_UPDATE") then
         local name = GetUnitName("target")
-        wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
+        wait(2, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
 	elseif (event == "PLAYER_TARGET_CHANGED") then
         local name = GetUnitName("target")
         if (name ~= EngBot_PlayerName) then
@@ -2069,13 +2069,13 @@ function EngBot_RightClick_Whisper()
         itm = EngBot_item_cache[bagnum][slotnum];
         if (command == "t ") then
             InitiateTrade("target")
-            wait(1, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"]..param)
+            wait(2, function(cmd) SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target")) end, command..itm["itemlink"]..param)
         else
             local cmd = command..itm["itemlink"]
             if (itm["mailIndex"] ~= "0") then cmd = command..itm["mailIndex"] end
             SendChatMessage(cmd, "WHISPER", nil, GetUnitName("target"));
             if (command ~= "cast ") then
-                wait(1, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
+                wait(2, function(command) SendChatMessage(command, "WHISPER", nil, GetUnitName("target")) end, EngBot_GetReloadQuery())
             end
         end
     end
