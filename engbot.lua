@@ -2158,6 +2158,13 @@ function EngBot_frame_RightClickMenu_populate(level)
         UIDropDownMenu_AddButton(info, level);
 
         info = {
+            ["text"] = "Disenchant",
+            ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="cast Disenchant " },
+            ["func"] = EngBot_RightClick_Whisper
+        };
+        UIDropDownMenu_AddButton(info, level);
+
+        info = {
             ["text"] = "Destroy",
             ["value"] = { ["bagnum"]=bagnum, ["slotnum"]=slotnum, ["command"]="destroy " },
             ["func"] = EngBot_RightClick_Whisper
