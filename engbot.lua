@@ -3275,6 +3275,8 @@ function EngBot_GetReloadQuery()
         query = "mail ?";
     elseif (EngBot_Mode == "bot_spell_item") then
         query = "spells";
+    elseif (EngBot_Mode == "bot_equip_item") then
+        query = "e ?";
     end
     return query
 end
@@ -3292,6 +3294,8 @@ function EngBot_OnEvent(event)
             EngBot_ClearForMode("bot_mail_item")
         elseif (message == "=== Spells ===") then
             EngBot_ClearForMode("bot_spell_item")
+        elseif (message == "=== Equip ===") then
+            EngBot_ClearForMode("bot_item")
         end
         if (sender == name) then
             EngBot_AtBot = 1;
@@ -3303,6 +3307,8 @@ function EngBot_OnEvent(event)
                 EngBotFrameTitleText:SetText(name.. "'s Mail")
             elseif (EngBot_Mode == "bot_spell_item") then
                 EngBotFrameTitleText:SetText(name.. "'s Tradeskill")
+            elseif (EngBot_Mode == "bot_equip_item") then
+                EngBotFrameTitleText:SetText(name.. "'s Equipment")
             else
                 EngBotFrameTitleText:SetText(name.. "'s Bank")
             end
